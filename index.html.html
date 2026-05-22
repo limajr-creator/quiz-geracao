@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Qual Geração Vive em Você?</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #ff2d78;
+  --purple: #8b2cf5;
+  --blue: #00b4f0;
+  --dark: #0d0d1a;
+  --glass: rgba(255,255,255,0.08);
+  --glass-border: rgba(255,255,255,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  color: white;
+  overflow-x: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* BACKGROUND ANIMATED */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: float 12s ease-in-out infinite;
+}
+.orb1 { width:500px; height:500px; background:var(--pink); top:-150px; left:-150px; animation-delay:0s; }
+.orb2 { width:400px; height:400px; background:var(--purple); bottom:-100px; right:-100px; animation-delay:-4s; }
+.orb3 { width:300px; height:300px; background:var(--blue); top:50%; left:50%; transform:translate(-50%,-50%); animation-delay:-8s; }
+
+@keyframes float {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-30px) scale(1.05); }
+}
+
+/* MAIN */
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 28px 16px 40px;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.badge {
+  display: inline-block;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  padding: 6px 18px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(36px, 10vw, 56px);
+  font-weight: 800;
+  line-height: 1.0;
+  background: linear-gradient(135deg, #fff 30%, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.subtitle {
+  margin-top: 14px;
+  font-size: 15px;
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
+/* PROGRESS */
+.progress-wrap {
+  margin-bottom: 28px;
+}
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  opacity: 0.5;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.progress-track {
+  height: 5px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--pink), var(--purple), var(--blue));
+  border-radius: 100px;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* CARD */
+.card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 28px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  margin-bottom: 16px;
+}
+
+/* QUESTION */
+.q-num {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-bottom: 10px;
+}
+.q-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 22px;
+}
+
+/* OPTIONS */
+.options { display: flex; flex-direction: column; gap: 10px; }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.opt label:active { transform: scale(0.98); }
+.opt-circle {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.opt-circle::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.opt input:checked + label {
+  background: linear-gradient(135deg, rgba(255,45,120,0.25), rgba(139,44,245,0.25));
+  border-color: var(--pink);
+}
+.opt input:checked + label .opt-circle {
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  border-color: transparent;
+}
+.opt input:checked + label .opt-circle::after { opacity: 1; }
+
+/* BUTTON */
+.btn {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 18px;
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white;
+  letter-spacing: 0.5px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.btn:active::after { opacity: 1; }
+.btn:active { transform: scale(0.99); }
+
+/* RESULTADO */
+#resultado { display: none; }
+
+.result-card {
+  border-radius: 28px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(40px) scale(0.95); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.result-top {
+  padding: 36px 28px 28px;
+  text-align: center;
+  position: relative;
+}
+.result-emoji {
+  font-size: 64px;
+  margin-bottom: 8px;
+  display: block;
+  animation: bounce 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+}
+@keyframes bounce {
+  from { opacity:0; transform:scale(0) rotate(-10deg); }
+  to   { opacity:1; transform:scale(1) rotate(0deg); }
+}
+.result-label {
+  display: inline-block;
+  padding: 5px 16px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.2);
+  margin-bottom: 14px;
+}
+.result-name {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(30px, 8vw, 44px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+.result-desc {
+  margin-top: 12px;
+  font-size: 15px;
+  opacity: 0.85;
+  line-height: 1.55;
+}
+
+/* MUSIC CARD */
+.music-card {
+  margin: 16px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 20px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+}
+.music-disc {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 3px solid rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  position: relative;
+  overflow: hidden;
+}
+.music-disc::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.06) 120deg, transparent 240deg);
+  animation: spin 3s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.music-info { flex: 1; min-width: 0; }
+.music-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 4px;
+}
+.music-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.music-artist {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+.music-wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.music-wave span {
+  display: block;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to top, var(--pink), var(--purple));
+  animation: wave 0.8s ease-in-out infinite;
+}
+.music-wave span:nth-child(1) { height:8px; animation-delay:0s; }
+.music-wave span:nth-child(2) { height:18px; animation-delay:0.15s; }
+.music-wave span:nth-child(3) { height:12px; animation-delay:0.3s; }
+.music-wave span:nth-child(4) { height:20px; animation-delay:0.1s; }
+.music-wave span:nth-child(5) { height:9px; animation-delay:0.25s; }
+@keyframes wave {
+  0%,100% { transform:scaleY(1); }
+  50% { transform:scaleY(0.3); }
+}
+
+/* SPOTIFY EMBED */
+.spotify-wrap {
+  margin: 0 16px 16px;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+}
+.spotify-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 10px;
+}
+
+/* MUSIC MEANING */
+.meaning-card {
+  margin: 0 16px 16px;
+  padding: 18px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 18px;
+  border-left: 3px solid;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.35s both;
+}
+.meaning-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+.meaning-card strong {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+/* PHRASE */
+.phrase-card {
+  margin: 0 16px 16px;
+  padding: 20px;
+  text-align: center;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.45s both;
+}
+.phrase-card blockquote {
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.6;
+  opacity: 0.75;
+}
+.phrase-card cite {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.4;
+  font-style: normal;
+}
+
+/* REFAZER */
+.btn-refazer {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 18px;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: white;
+  letter-spacing: 0.5px;
+  transition: all 0.25s ease;
+  margin-top: 8px;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.55s both;
+}
+.btn-refazer:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
+
+/* QUOTE FINAL */
+.quote-final {
+  text-align: center;
+  padding: 28px 20px;
+  opacity: 0.45;
+  font-size: 13px;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* Particles */
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<div class="particles" id="particles"></div>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="badge">✨ Teste Viral de Personalidade ✨</div>
+    <h1 class="title">QUAL GERAÇÃO<br>VIVE EM VOCÊ?</h1>
+    <p class="subtitle">Sua certidão pode dizer uma coisa...<br>mas sua personalidade entrega outra 👀</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-labels">
+      <span id="progLabel">0 de 3 respondidas</span>
+      <span id="progPct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <form id="quizForm">
+
+    <!-- Q1 -->
+    <div class="card">
+      <div class="q-num">Pergunta 01</div>
+      <div class="q-text">Quando preciso aprender algo novo...</div>
+      <div class="options">
+        <div class="opt"><input type="radio" name="q1" id="q1a" value="A"><label for="q1a"><span class="opt-circle"></span>Prefiro alguém explicando pessoalmente</label></div>
+        <div class="opt"><input type="radio" name="q1" id="q1b" value="B"><label for="q1b"><span class="opt-circle"></span>Quero um passo a passo organizado</label></div>
+        <div class="opt"><input type="radio" name="q1" id="q1c" value="C"><label for="q1c"><span class="opt-circle"></span>Vou direto para vídeos e tutoriais</label></div>
+        <div class="opt"><input type="radio" name="q1" id="q1d" value="D"><label for="q1d"><span class="opt-circle"></span>Descubro sozinho rapidinho</label></div>
+        <div class="opt"><input type="radio" name="q1" id="q1e" value="E"><label for="q1e"><span class="opt-circle"></span>Precisa ser interativo e visual</label></div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="card">
+      <div class="q-num">Pergunta 02</div>
+      <div class="q-text">Sua comunicação favorita:</div>
+      <div class="options">
+        <div class="opt"><input type="radio" name="q2" id="q2a" value="A"><label for="q2a"><span class="opt-circle"></span>Conversa olho no olho</label></div>
+        <div class="opt"><input type="radio" name="q2" id="q2b" value="B"><label for="q2b"><span class="opt-circle"></span>E-mail bem explicado</label></div>
+        <div class="opt"><input type="radio" name="q2" id="q2c" value="C"><label for="q2c"><span class="opt-circle"></span>WhatsApp</label></div>
+        <div class="opt"><input type="radio" name="q2" id="q2d" value="D"><label for="q2d"><span class="opt-circle"></span>Áudio curto e objetivo</label></div>
+        <div class="opt"><input type="radio" name="q2" id="q2e" value="E"><label for="q2e"><span class="opt-circle"></span>Meme + emoji + vídeo curto</label></div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="card">
+      <div class="q-num">Pergunta 03</div>
+      <div class="q-text">No trabalho você valoriza:</div>
+      <div class="options">
+        <div class="opt"><input type="radio" name="q3" id="q3a" value="A"><label for="q3a"><span class="opt-circle"></span>Segurança</label></div>
+        <div class="opt"><input type="radio" name="q3" id="q3b" value="B"><label for="q3b"><span class="opt-circle"></span>Organização</label></div>
+        <div class="opt"><input type="radio" name="q3" id="q3c" value="C"><label for="q3c"><span class="opt-circle"></span>Propósito</label></div>
+        <div class="opt"><input type="radio" name="q3" id="q3d" value="D"><label for="q3d"><span class="opt-circle"></span>Flexibilidade</label></div>
+        <div class="opt"><input type="radio" name="q3" id="q3e" value="E"><label for="q3e"><span class="opt-circle"></span>Inovação constante</label></div>
+      </div>
+    </div>
+
+    <button class="btn" type="button" onclick="resultadoFinal()">
+      DESCOBRIR MEU RESULTADO 🚀
+    </button>
+
+  </form>
+
+  <div id="resultado"></div>
+
+  <p class="quote-final">"Mais importante do que a geração em que nascemos<br>é aprender a nos comunicar com todas elas."</p>
+
+</div>
+
+<script>
+// Progress
+document.querySelectorAll("input[type='radio']").forEach(r => r.addEventListener("change", atualizarBarra));
+
+function atualizarBarra() {
+  let n = 0;
+  for (let i = 1; i <= 3; i++) {
+    if (document.querySelector(`input[name="q${i}"]:checked`)) n++;
+  }
+  let pct = Math.round((n / 3) * 100);
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progLabel").textContent = n + " de 3 respondidas";
+  document.getElementById("progPct").textContent = pct + "%";
+}
+
+// Data
+const geracoes = {
+  A: {
+    nome: "BABY BOOMER",
+    emoji: "📞",
+    cor1: "#f77f00",
+    cor2: "#d62828",
+    descricao: "Você valoriza estabilidade, experiência e relações humanas profundas. Acredita no poder do contato real e na construção de legados duradouros.",
+    musica: "Imagine",
+    artista: "John Lennon",
+    discEmoji: "🎵",
+    spotifyId: "7pKfPomDEeI4TPT6EOYjn9",
+    musicaMeaning: "Uma canção que resume toda a essência de uma geração que sonhou em mudar o mundo. 'Imagine' representa o idealismo coletivo, a crença de que a paz é possível e que legados reais se constroem com propósito — não apenas com sucesso.",
+    frase: "Você provavelmente ainda fala 'vamos marcar pessoalmente' — e tá certo nisso."
+  },
+  B: {
+    nome: "GERAÇÃO X",
+    emoji: "💼",
+    cor1: "#2b2d42",
+    cor2: "#8d99ae",
+    descricao: "Você é independente, estratégico e resolve problemas sem drama. Cresceu sem internet e aprendeu que resiliência é a única habilidade que nunca fica desatualizada.",
+    musica: "Smells Like Teen Spirit",
+    artista: "Nirvana",
+    discEmoji: "🎸",
+    spotifyId: "4CeeEOM32jQcH3eN9Q2dGj",
+    musicaMeaning: "O hino de uma geração que não pediu licença para questionar tudo. 'Smells Like Teen Spirit' captura a essência de quem cresceu desconfiando do sistema e preferindo construir o próprio caminho — com barulho ou em silêncio.",
+    frase: "Você resolve problemas sem fazer drama. E isso é raro demais."
+  },
+  C: {
+    nome: "MILLENNIAL",
+    emoji: "☕",
+    cor1: "#06d6a0",
+    cor2: "#118ab2",
+    descricao: "Você busca propósito, conexão e equilíbrio entre vida e trabalho. Cresceu entre dois mundos — o analógico e o digital — e carrega o melhor dos dois.",
+    musica: "Happy",
+    artista: "Pharrell Williams",
+    discEmoji: "🎤",
+    spotifyId: "60nZcImufyMA1MKQY3dcCH",
+    musicaMeaning: "Mais do que uma música animada, 'Happy' traduz a busca por significado que define os millennials. É sobre encontrar alegria genuína no trabalho, nas relações e nas experiências — não apenas em conquistas materiais.",
+    frase: "Você ama café, propósito e provavelmente já teve burnout uma vez (ou três)."
+  },
+  D: {
+    nome: "GERAÇÃO Z",
+    emoji: "📱",
+    cor1: "#7400b8",
+    cor2: "#5390d9",
+    descricao: "Você aprende rápido, pensa em múltiplas telas ao mesmo tempo e pesquisa TUDO antes de decidir qualquer coisa. Digital é seu habitat natural.",
+    musica: "Blinding Lights",
+    artista: "The Weeknd",
+    discEmoji: "🌆",
+    spotifyId: "0VjIjW4GlUZAMYd2vXMi3b",
+    musicaMeaning: "'Blinding Lights' pulsa no ritmo da Geração Z: veloz, intensa e hiperconectada. A música captura a adrenalina de viver no loop infinito de notificações, tendências e estímulos que nunca param — e mesmo assim, sempre querer mais.",
+    frase: "Você pesquisa tudo antes de decidir qualquer coisa. Inclusive onde almoçar."
+  },
+  E: {
+    nome: "GERAÇÃO ALPHA",
+    emoji: "🚀",
+    cor1: "#f72585",
+    cor2: "#7209b7",
+    descricao: "Seu cérebro opera em velocidade TikTok. Você nasceu num mundo de IA, realidade aumentada e criadores de conteúdo — e isso moldou tudo em você.",
+    musica: "Flowers",
+    artista: "Miley Cyrus",
+    discEmoji: "🌸",
+    spotifyId: "7DSAEUvxU8FajXtRloy8M0",
+    musicaMeaning: "'Flowers' é o manifesto da geração mais autônoma da história. Representa a Geração Alpha: identidade forte, independência radical e a convicção de que você pode construir exatamente o mundo que quer viver — sem pedir aprovação.",
+    frase: "Você nasceu pronto para o futuro. O resto do mundo que corra atrás."
+  }
+};
+
+function resultadoFinal() {
+  let respostas = { A:0, B:0, C:0, D:0, E:0 };
+  for (let i = 1; i <= 3; i++) {
+    let r = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!r) { alert("Ei 👀 responde todas as perguntas primeiro!"); return; }
+    respostas[r.value]++;
+  }
+
+  let maior = Math.max(...Object.values(respostas));
+  let vencedores = Object.keys(respostas).filter(k => respostas[k] === maior);
+
+  let html = "";
+
+  if (vencedores.length > 1) {
+    let g1 = geracoes[vencedores[0]];
+    let g2 = geracoes[vencedores[1]];
+    html = `
+      <div class="result-card" style="background:linear-gradient(135deg,${g1.cor1},${g2.cor2});">
+        <div class="result-top">
+          <span class="result-label">Resultado Híbrido</span>
+          <span class="result-emoji">🔥⚡</span>
+          <h2 class="result-name">${g1.nome}<br><small style="font-size:0.55em;opacity:0.7">+</small><br>${g2.nome}</h2>
+          <p class="result-desc">Você mistura características de duas gerações. Seu cérebro provavelmente vive em conflito saudável entre produtividade e memes — e isso é um superpoder.</p>
+        </div>
+        <div class="spotify-wrap">
+          <div class="spotify-label">🎵 Uma das suas músicas</div>
+          <iframe
+            src="https://open.spotify.com/embed/track/${g1.spotifyId}?utm_source=generator&theme=0"
+            width="100%"
+            height="152"
+            frameborder="0"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            style="border-radius:16px;display:block;"
+          ></iframe>
+        </div>
+      </div>
+    `;
+  } else {
+    let g = geracoes[vencedores[0]];
+    html = `
+      <div class="result-card" style="background:linear-gradient(135deg,${g.cor1},${g.cor2});">
+        <div class="result-top">
+          <span class="result-label">Seu Resultado</span>
+          <span class="result-emoji">${g.emoji}</span>
+          <h2 class="result-name">${g.nome}</h2>
+          <p class="result-desc">${g.descricao}</p>
+        </div>
+        <div class="spotify-wrap">
+          <div class="spotify-label">🎵 Música da sua Geração</div>
+          <iframe
+            src="https://open.spotify.com/embed/track/${g.spotifyId}?utm_source=generator&theme=0"
+            width="100%"
+            height="152"
+            frameborder="0"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            style="border-radius:16px;display:block;"
+          ></iframe>
+        </div>
+        <div class="meaning-card" style="border-color:rgba(255,255,255,0.4);">
+          <strong>🎧 Por que essa música?</strong>
+          <p>${g.musicaMeaning}</p>
+        </div>
+        <div class="phrase-card">
+          <blockquote>${g.frase}</blockquote>
+          <cite>— ${g.nome}</cite>
+        </div>
+      </div>
+      <button class="btn-refazer" onclick="refazer()">↩ Refazer o Teste</button>
+    `;
+  }
+
+  const el = document.getElementById("resultado");
+  el.innerHTML = html;
+  el.style.display = "block";
+
+  launchParticles();
+
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
+}
+
+function refazer() {
+  document.getElementById("quizForm").reset();
+  document.getElementById("resultado").style.display = "none";
+  document.getElementById("resultado").innerHTML = "";
+  atualizarBarra();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Confetti particles
+function launchParticles() {
+  const container = document.getElementById("particles");
+  container.innerHTML = "";
+  const colors = ["#ff2d78","#8b2cf5","#00b4f0","#fff","#f72585","#06d6a0"];
+  for (let i = 0; i < 40; i++) {
+    let p = document.createElement("div");
+    p.className = "particle";
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${Math.random()*60 + 20}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${Math.random()*6+3}px;
+      height:${Math.random()*6+3}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation: particleFly ${Math.random()*1.5+0.5}s ease-out ${Math.random()*0.5}s both;
+    `;
+    container.appendChild(p);
+  }
+}
+
+// Particle keyframe injection
+const style = document.createElement("style");
+style.textContent = `
+@keyframes particleFly {
+  0% { opacity:1; transform:translateY(0) rotate(0deg) scale(1); }
+  100% { opacity:0; transform:translateY(-120px) rotate(${Math.random()*360}deg) scale(0); }
+}`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
