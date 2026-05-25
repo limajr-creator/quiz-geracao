@@ -802,62 +802,103 @@ style.textContent = `
 }`;
 document.head.appendChild(style);
 
-// ── CONTADOR SUPABASE ──────────────────────────────────────
+// ── CONTADOR SUPABASE FIXO ────────────────────────────────
 const SUPA_URL = "https://mjspiuhbfklujwtlftpw.supabase.co";
-const SUPA_KEY = "sb_publishable_3InHuy3mno7xGL6-GFaDCQ_1NAS356h";
-const PING_INTERVAL = 20000;   // atualiza presença a cada 20s
-const LIMPAR_APOS  = 45;       // considera offline após 45s sem ping
+const SUPA_KEY = "SUA_CHAVE_SUPABASE";
 
-// gera ID único para esta sessão
-const SESSION_ID = Math.random().toString(36).slice(2) + Date.now();
+const PING_INTERVAL = 20000;
+const LIMPAR_APOS = 45;
 
+// SESSION ID persistente
+let SESSION_ID = sessionStorage.getItem("session_id");
+
+if (!SESSION_ID) {
+  SESSION_ID = crypto.randomUUID();
+  sessionStorage.setItem("session_id", SESSION_ID);
+}
+
+// FETCH BASE
 async function supaFetch(method, path, body) {
-  const headers = {
-    "Content-Type": "application/json",
-    "apikey": SUPA_KEY,
-    "Authorization": "Bearer " + SUPA_KEY,
-  };
-  if (method === "POST") {
-    headers["Prefer"] = "resolution=merge-duplicates";
-  }
+
   return fetch(SUPA_URL + path, {
     method,
-    headers,
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPA_KEY,
+      "Authorization": "Bearer " + SUPA_KEY,
+      "Prefer": "resolution=merge-duplicates"
+    },
     body: body ? JSON.stringify(body) : undefined
   });
+
 }
 
+// PING PRESENÇA
 async function pingPresenca() {
-  await supaFetch("POST", "/rest/v1/visitantes", {
-    session_id: SESSION_ID,
-    ultima_vez: new Date().toISOString()
-  });
+
+  await supaFetch(
+    "POST",
+    "/rest/v1/visitantes?on_conflict=session_id",
+    {
+      session_id: SESSION_ID,
+      ultima_vez: new Date().toISOString()
+    }
+  );
+
 }
 
+// CONTAR ONLINE
 async function contarOnline() {
-  const corte = new Date(Date.now() - LIMPAR_APOS * 1000).toISOString();
-  const res = await supaFetch("GET", `/rest/v1/visitantes?ultima_vez=gte.${corte}&select=session_id`);
+
+  const corte = new Date(
+    Date.now() - LIMPAR_APOS * 1000
+  ).toISOString();
+
+  const res = await supaFetch(
+    "GET",
+    `/rest/v1/visitantes?ultima_vez=gte.${corte}&select=session_id`
+  );
+
   if (!res.ok) return;
+
   const dados = await res.json();
-  const total = dados.length || 1;
-  document.getElementById("onlineCount").textContent = total;
+
+  // REMOVE DUPLICATAS
+  const unicos = [
+    ...new Set(dados.map(d => d.session_id))
+  ];
+
+  document.getElementById("onlineCount").textContent =
+    unicos.length || 1;
+
 }
 
+// REMOVE SESSÃO
 async function removerSessao() {
-  await supaFetch("DELETE", `/rest/v1/visitantes?session_id=eq.${SESSION_ID}`);
+
+  await supaFetch(
+    "DELETE",
+    `/rest/v1/visitantes?session_id=eq.${SESSION_ID}`
+  );
+
 }
 
-// inicia
+// INICIA
 (async () => {
+
   await pingPresenca();
   await contarOnline();
+
   setInterval(async () => {
+
     await pingPresenca();
     await contarOnline();
+
   }, PING_INTERVAL);
+
 })();
 
-// remove ao fechar aba
+// FECHAR ABA
 window.addEventListener("beforeunload", removerSessao);
 // ────────────────────────────────────────────────────────────
 </script>
