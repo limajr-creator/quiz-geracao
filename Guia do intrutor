@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conflito Geracional — Revemar Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #1a2e45;
+    --blue: #1a4fa0;
+    --blue-bright: #2563eb;
+    --accent: #f59e0b;
+    --accent-light: #fbbf24;
+    --white: #f8fafc;
+    --gray: #94a3b8;
+    --gray-light: #e2e8f0;
+    --red: #dc2626;
+    --green: #16a34a;
+    --purple: #7c3aed;
+    --teal: #0891b2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(26,79,160,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 90%, rgba(245,158,11,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(26,79,160,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,79,160,0.08) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(245,158,11,0.15);
+    border: 1px solid rgba(245,158,11,0.4);
+    color: var(--accent-light);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.8rem, 8vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    animation: fadeUp 0.8s 0.1s ease both;
+    max-width: 800px;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--gray);
+    max-width: 520px;
+    margin: 1.5rem auto 2.5rem;
+    line-height: 1.7;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.8rem;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--blue-bright);
+    color: white;
+  }
+  .btn-primary:hover { background: #1d4ed8; transform: translateY(-2px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 1.5px solid rgba(255,255,255,0.2);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  .gen-pills {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 3rem;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .pill {
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border: 1.5px solid;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,27,42,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 0 2rem;
+  }
+
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0.75rem 0;
+  }
+
+  .nav-inner::-webkit-scrollbar { display: none; }
+
+  .nav-item {
+    white-space: nowrap;
+    padding: 0.45rem 1rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--gray);
+    border: none;
+    background: none;
+  }
+
+  .nav-item:hover, .nav-item.active {
+    background: rgba(37,99,235,0.2);
+    color: var(--white);
+  }
+
+  /* ─── SECTIONS ─── */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+    display: none;
+  }
+
+  .section.active { display: block; }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+
+  .section-desc {
+    color: var(--gray);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 580px;
+    margin-bottom: 3rem;
+  }
+
+  /* ─── CARDS GRID ─── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 1.8rem;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-accent, var(--blue-bright));
+    border-radius: 16px 16px 0 0;
+  }
+
+  .card:hover {
+    border-color: rgba(255,255,255,0.15);
+    transform: translateY(-4px);
+    background: rgba(255,255,255,0.07);
+  }
+
+  .card-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .card p {
+    color: var(--gray);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .card ul {
+    list-style: none;
+    margin-top: 0.75rem;
+  }
+
+  .card ul li {
+    color: var(--gray);
+    font-size: 0.88rem;
+    padding: 0.25rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .card ul li::before {
+    content: '›';
+    color: var(--card-accent, var(--accent));
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 0.05rem;
+  }
+
+  /* ─── GENERATION TABS ─── */
+  .gen-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .gen-tab {
+    padding: 0.55rem 1.2rem;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background: transparent;
+    color: var(--gray);
+    transition: all 0.2s;
+  }
+
+  .gen-tab:hover { border-color: rgba(255,255,255,0.25); color: var(--white); }
+  .gen-tab.active { color: var(--navy); }
+
+  .gen-content { display: none; }
+  .gen-content.active { display: block; animation: fadeUp 0.4s ease; }
+
+  .gen-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .gen-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+
+  .gen-year {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-bottom: 1rem;
+  }
+
+  .gen-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+
+  .gen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .gen-block {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .gen-block h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    color: var(--gray);
+  }
+
+  .gen-block ul {
+    list-style: none;
+  }
+
+  .gen-block ul li {
+    font-size: 0.9rem;
+    padding: 0.3rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .gen-block ul li:last-child { border-bottom: none; }
+
+  .gen-block ul li::before {
+    content: '·';
+    font-size: 1.2rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+  }
+
+  .conflict-tag {
+    display: inline-block;
+    background: rgba(220,38,38,0.1);
+    border: 1px solid rgba(220,38,38,0.25);
+    color: #f87171;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    margin: 0.2rem;
+  }
+
+  .strategy-tag {
+    display: inline-block;
+    background: rgba(22,163,74,0.1);
+    border: 1px solid rgba(22,163,74,0.25);
+    color: #4ade80;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    margin: 0.2rem;
+  }
+
+  /* ─── CYCLE ─── */
+  .cycle-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 680px;
+  }
+
+  .cycle-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .cycle-step:hover {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .cycle-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .cycle-content h4 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .cycle-content p {
+    color: var(--gray);
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .cycle-arrow {
+    text-align: center;
+    color: var(--gray);
+    font-size: 1.2rem;
+    margin: -0.3rem 0;
+  }
+
+  /* ─── QUOTE ─── */
+  .quote-box {
+    background: linear-gradient(135deg, rgba(26,79,160,0.2) 0%, rgba(245,158,11,0.08) 100%);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 16px;
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .quote-box::before {
+    content: '"';
+    position: absolute;
+    top: -0.5rem;
+    left: 1.5rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 8rem;
+    color: rgba(245,158,11,0.12);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .quote-text {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: 600;
+    line-height: 1.5;
+    position: relative;
+    z-index: 1;
+  }
+
+  .quote-author {
+    margin-top: 1rem;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* ─── FORMULA ─── */
+  .formula {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+  }
+
+  .formula-part {
+    text-align: center;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .formula-part .label {
+    font-size: 0.75rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .formula-part .value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+  }
+
+  .formula-op {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gray);
+  }
+
+  /* ─── CASES ─── */
+  .case-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .case-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: background 0.2s;
+  }
+
+  .case-header:hover { background: rgba(255,255,255,0.03); }
+
+  .case-header h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    flex: 1;
+  }
+
+  .case-toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+
+  .case-body {
+    padding: 0 2rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s;
+  }
+
+  .case-body.open {
+    max-height: 800px;
+    padding: 1.5rem 2rem;
+  }
+
+  .case-toggle.open { transform: rotate(45deg); }
+
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .case-block {
+    padding: 1rem;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .case-block h4 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .case-block ul {
+    list-style: none;
+  }
+
+  .case-block li {
+    font-size: 0.88rem;
+    color: var(--gray);
+    padding: 0.2rem 0;
+  }
+
+  /* ─── DYNAMICS ─── */
+  .dynamic-card {
+    background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(124,58,237,0.1) 100%);
+    border: 1px solid rgba(37,99,235,0.25);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .dynamic-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .dynamic-card .desc {
+    color: var(--gray);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  .steps-list {
+    list-style: none;
+    counter-reset: steps;
+  }
+
+  .steps-list li {
+    counter-increment: steps;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .steps-list li:last-child { border-bottom: none; }
+
+  .steps-list li::before {
+    content: counter(steps);
+    width: 22px;
+    height: 22px;
+    background: rgba(37,99,235,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    color: var(--white);
+  }
+
+  /* ─── PROGRESS TRACKER ─── */
+  .progress-bar-wrap {
+    margin: 2.5rem 0;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--blue-bright), var(--accent));
+    transition: width 0.6s ease;
+  }
+
+  /* ─── FOOTER NAV ─── */
+  .foot-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .foot-nav .btn { font-size: 0.85rem; padding: 0.7rem 1.4rem; }
+
+  /* ─── KEYFRAMES ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    .gen-grid { grid-template-columns: 1fr; }
+    .formula { flex-direction: column; }
+    .formula-op { transform: rotate(90deg); }
+    .case-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── HIGHLIGHT LINE ─── */
+  .hl { color: var(--accent); }
+
+  /* Pill colors */
+  .pill-boomer { border-color: #f59e0b44; color: #fbbf24; background: #f59e0b11; }
+  .pill-x      { border-color: #10b98144; color: #34d399; background: #10b98111; }
+  .pill-y      { border-color: #8b5cf644; color: #a78bfa; background: #8b5cf611; }
+  .pill-z      { border-color: #3b82f644; color: #93c5fd; background: #3b82f611; }
+  .pill-alpha  { border-color: #ec489944; color: #f9a8d4; background: #ec489911; }
+
+  /* Generation accent colors */
+  .boomer { --gen-color: #f59e0b; }
+  .genx   { --gen-color: #10b981; }
+  .geny   { --gen-color: #8b5cf6; }
+  .genz   { --gen-color: #3b82f6; }
+  .alpha  { --gen-color: #ec4899; }
+  .beta   { --gen-color: #ef4444; }
+
+  .gen-tab.boomer.active { background: #f59e0b; border-color: #f59e0b; }
+  .gen-tab.genx.active   { background: #10b981; border-color: #10b981; }
+  .gen-tab.geny.active   { background: #8b5cf6; border-color: #8b5cf6; }
+  .gen-tab.genz.active   { background: #3b82f6; border-color: #3b82f6; }
+  .gen-tab.alpha.active  { background: #ec4899; border-color: #ec4899; }
+  .gen-tab.beta.active   { background: #ef4444; border-color: #ef4444; }
+
+  .gen-content.boomer .gen-badge { background: #f59e0b22; border: 1px solid #f59e0b44; color: #fbbf24; }
+  .gen-content.genx   .gen-badge { background: #10b98122; border: 1px solid #10b98144; color: #34d399; }
+  .gen-content.geny   .gen-badge { background: #8b5cf622; border: 1px solid #8b5cf644; color: #a78bfa; }
+  .gen-content.genz   .gen-badge { background: #3b82f622; border: 1px solid #3b82f644; color: #93c5fd; }
+  .gen-content.alpha  .gen-badge { background: #ec489922; border: 1px solid #ec489944; color: #f9a8d4; }
+  .gen-content.beta   .gen-badge { background: #ef444422; border: 1px solid #ef444444; color: #fca5a5; }
+
+  .gen-content.boomer .gen-block ul li::before { color: #fbbf24; }
+  .gen-content.genx   .gen-block ul li::before { color: #34d399; }
+  .gen-content.geny   .gen-block ul li::before { color: #a78bfa; }
+  .gen-content.genz   .gen-block ul li::before { color: #93c5fd; }
+  .gen-content.alpha  .gen-block ul li::before { color: #f9a8d4; }
+  .gen-content.beta   .gen-block ul li::before { color: #fca5a5; }
+
+  .divider {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 5rem 0;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="grid-bg"></div>
+  <div class="badge">Revemar Academy · Treinamento</div>
+  <h1>Conflito<br><span>Geracional</span></h1>
+  <p class="hero-sub">Como diferentes gerações impactam a comunicação, liderança e produtividade nas equipes.</p>
+  <div class="hero-cta">
+    <button class="btn btn-primary" onclick="showSection('conceitos')">▶ Iniciar Treinamento</button>
+    <button class="btn btn-outline" onclick="showSection('geracoes')">Ver Gerações</button>
+  </div>
+  <div class="gen-pills">
+    <span class="pill pill-boomer">Baby Boomers</span>
+    <span class="pill pill-x">Geração X</span>
+    <span class="pill pill-y">Millennials</span>
+    <span class="pill pill-z">Geração Z</span>
+    <span class="pill pill-alpha">Alpha</span>
+  </div>
+</section>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <button class="nav-item" onclick="showHero()">🏠 Início</button>
+    <button class="nav-item" id="nav-conceitos" onclick="showSection('conceitos')">📚 Conceitos</button>
+    <button class="nav-item" id="nav-geracoes" onclick="showSection('geracoes')">👥 Gerações</button>
+    <button class="nav-item" id="nav-conflitos" onclick="showSection('conflitos')">⚡ Conflitos</button>
+    <button class="nav-item" id="nav-comunicacao" onclick="showSection('comunicacao')">💬 Comunicação</button>
+    <button class="nav-item" id="nav-dinamicas" onclick="showSection('dinamicas')">🎯 Dinâmicas</button>
+    <button class="nav-item" id="nav-casos" onclick="showSection('casos')">📋 Casos Práticos</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION: CONCEITOS -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="conceitos">
+  <div class="section-label">Módulo 1</div>
+  <h2 class="section-title">Fundamentos do<br>Conflito Geracional</h2>
+  <p class="section-desc">Antes de agir, precisamos entender o que são gerações e de onde surgem os conflitos.</p>
+
+  <div class="cards-grid">
+    <div class="card" style="--card-accent: #2563eb;">
+      <div class="card-icon">🎯</div>
+      <h3>Objetivo do Treinamento</h3>
+      <ul>
+        <li>Fortalecer relações entre gerações</li>
+        <li>Melhorar a colaboração interna</li>
+        <li>Reduzir conflitos no ambiente de trabalho</li>
+        <li>Aumentar a produtividade das equipes</li>
+      </ul>
+    </div>
+
+    <div class="card" style="--card-accent: #f59e0b;">
+      <div class="card-icon">📖</div>
+      <h3>O que é Geração?</h3>
+      <p style="color:var(--gray); font-size:0.85rem; margin-bottom:0.75rem;">Karl Mannheim (1928) — Geração não é apenas idade. Ela envolve:</p>
+      <ul>
+        <li>Experiências históricas</li>
+        <li>Cultura e tecnologia da época</li>
+        <li>Contexto econômico</li>
+        <li>Eventos sociais marcantes</li>
+      </ul>
+    </div>
+
+    <div class="card" style="--card-accent: #ef4444;">
+      <div class="card-icon">⚡</div>
+      <h3>O que é Conflito Geracional?</h3>
+      <p style="color:var(--gray); font-size:0.85rem; margin-bottom:0.75rem;">Nasce das diferenças em:</p>
+      <ul>
+        <li>Valores e expectativas</li>
+        <li>Formas de comunicação</li>
+        <li>Comportamentos no trabalho</li>
+        <li>Relação com hierarquia e tecnologia</li>
+      </ul>
+    </div>
+
+    <div class="card" style="--card-accent: #10b981;">
+      <div class="card-icon">💡</div>
+      <h3>Diversidade Geracional</h3>
+      <p style="color:var(--gray); font-size:0.85rem; margin-bottom:0.75rem;">Quando bem gerenciada, a diversidade:</p>
+      <ul>
+        <li>Aumenta a criatividade</li>
+        <li>Amplia perspectivas</li>
+        <li>Melhora a tomada de decisão</li>
+        <li>Gera inovação</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="quote-box" style="margin-top: 2.5rem;">
+    <p class="quote-text">"Não existe certo e errado, melhor ou pior. Apenas uma forma diferente de ver o mundo."</p>
+    <p class="quote-author">— Frase reflexiva do treinamento</p>
+  </div>
+
+  <div class="quote-box" style="background: linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(245,158,11,0.08) 100%); border-color: rgba(239,68,68,0.2); margin-top: 1.5rem;">
+    <p class="quote-text">"O problema não é ter gerações diferentes, é não ter um ambiente onde elas consigam se entender."</p>
+    <p class="quote-author">— Amy Edmondson, Psicóloga</p>
+  </div>
+
+  <div class="foot-nav">
+    <button class="btn btn-outline" onclick="showHero()">← Início</button>
+    <button class="btn btn-primary" onclick="showSection('geracoes')">Ver Gerações →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION: GERAÇÕES -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="geracoes">
+  <div class="section-label">Módulo 2</div>
+  <h2 class="section-title">As Gerações no<br>Mercado de Trabalho</h2>
+  <p class="section-desc">Cada geração foi moldada pelo mundo que viveu. Clique em cada uma para explorar suas características.</p>
+
+  <div class="gen-tabs">
+    <button class="gen-tab boomer active" onclick="showGen('boomer', this)">Baby Boomers</button>
+    <button class="gen-tab genx" onclick="showGen('genx', this)">Geração X</button>
+    <button class="gen-tab geny" onclick="showGen('geny', this)">Millennials</button>
+    <button class="gen-tab genz" onclick="showGen('genz', this)">Geração Z</button>
+    <button class="gen-tab alpha" onclick="showGen('alpha', this)">Alpha</button>
+    <button class="gen-tab beta" onclick="showGen('beta', this)">Beta</button>
+  </div>
+
+  <!-- BABY BOOMERS -->
+  <div class="gen-content boomer active" id="gen-boomer">
+    <div class="gen-header">
+      <div>
+        <span class="gen-badge">1946 – 1964</span>
+        <div class="gen-title">Baby Boomers</div>
+        <p style="color:var(--gray); font-size:0.9rem; max-width:480px;">Cresceram no pós-guerra, num período de crescimento econômico e otimismo. Valorizam profundamente a estabilidade e o esforço como caminho para o reconhecimento.</p>
+      </div>
+    </div>
+    <div class="gen-grid">
+      <div class="gen-block">
+        <h4>🧭 Quem são</h4>
+        <ul>
+          <li>Contexto pós-guerra</li>
+          <li>Crescimento econômico</li>
+          <li>Valorizam estabilidade</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚙️ O que fazem</h4>
+        <ul>
+          <li>Constroem carreira sólida</li>
+          <li>Permanecem mais tempo na empresa</li>
+          <li>Valorizam patrimônio</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>💭 O que pensam</h4>
+        <ul>
+          <li>Esforço gera reconhecimento</li>
+          <li>Persistência leva ao sucesso</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⭐ O que valorizam</h4>
+        <ul>
+          <li>Reconhecimento</li>
+          <li>Estabilidade</li>
+          <li>Legado</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>✅ Como liderar</h4>
+        <ul>
+          <li>Respeite a experiência</li>
+          <li>Valorize a trajetória</li>
+          <li>Demonstre comprometimento</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚠️ Possíveis conflitos</h4>
+        <ul>
+          <li>Resistência a mudanças rápidas</li>
+          <li>Dificuldade com novas tecnologias</li>
+          <li>Choque com informalidade</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- GERAÇÃO X -->
+  <div class="gen-content genx" id="gen-genx">
+    <div class="gen-header">
+      <div>
+        <span class="gen-badge">1965 – 1980</span>
+        <div class="gen-title">Geração X</div>
+        <p style="color:var(--gray); font-size:0.9rem; max-width:480px;">Independentes e pragmáticos, cresceram questionando modelos rígidos. Valorizam resultados e acreditam que a autoridade deve ser conquistada, não apenas imposta.</p>
+      </div>
+    </div>
+    <div class="gen-grid">
+      <div class="gen-block">
+        <h4>🧭 Características</h4>
+        <ul>
+          <li>Independência</li>
+          <li>Pragmatismo</li>
+          <li>Adaptabilidade</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚙️ O que fazem</h4>
+        <ul>
+          <li>Equilibram vida pessoal e profissional</li>
+          <li>Adaptam-se à tecnologia</li>
+          <li>Questionam modelos rígidos</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>💭 O que pensam</h4>
+        <ul>
+          <li>Resultado importa</li>
+          <li>Autoridade deve ser conquistada</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⭐ O que valorizam</h4>
+        <ul>
+          <li>Autonomia</li>
+          <li>Flexibilidade</li>
+          <li>Praticidade</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>✅ Como liderar</h4>
+        <ul>
+          <li>Seja transparente</li>
+          <li>Dê autonomia</li>
+          <li>Foque em resultados</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚠️ Possíveis conflitos</h4>
+        <ul>
+          <li>Impaciência com burocracia</li>
+          <li>Choque com excesso de supervisão</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MILLENNIALS -->
+  <div class="gen-content geny" id="gen-geny">
+    <div class="gen-header">
+      <div>
+        <span class="gen-badge">1981 – 1996</span>
+        <div class="gen-title">Millennials (Gen Y)</div>
+        <p style="color:var(--gray); font-size:0.9rem; max-width:480px;">Buscam propósito e significado no trabalho. Trocam mais de emprego, trabalham bem em equipe e precisam entender o "porquê" antes de se engajar.</p>
+      </div>
+    </div>
+    <div class="gen-grid">
+      <div class="gen-block">
+        <h4>🧭 Características</h4>
+        <ul>
+          <li>Busca por propósito</li>
+          <li>Desenvolvimento rápido</li>
+          <li>Colaboração</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚙️ O que fazem</h4>
+        <ul>
+          <li>Trocam mais de emprego</li>
+          <li>Trabalham bem em equipe</li>
+          <li>Buscam significado no trabalho</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>💭 O que pensam</h4>
+        <ul>
+          <li>O trabalho precisa fazer sentido</li>
+          <li>Experiências importam</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⭐ O que valorizam</h4>
+        <ul>
+          <li>Qualidade de vida</li>
+          <li>Liberdade</li>
+          <li>Diversidade</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>✅ Como liderar</h4>
+        <ul>
+          <li>Explique o propósito</li>
+          <li>Dê feedback constante</li>
+          <li>Incentive participação</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚠️ Possíveis conflitos</h4>
+        <ul>
+          <li>Frustração com crescimento lento</li>
+          <li>Desmotivação com ambientes rígidos</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- GERAÇÃO Z -->
+  <div class="gen-content genz" id="gen-genz">
+    <div class="gen-header">
+      <div>
+        <span class="gen-badge">1997 – 2009</span>
+        <div class="gen-title">Geração Z</div>
+        <p style="color:var(--gray); font-size:0.9rem; max-width:480px;">Hiperconectados e imediatistas, cresceram com a internet como parte natural da vida. Valorizam autenticidade e querem que suas vozes sejam ouvidas.</p>
+      </div>
+    </div>
+    <div class="gen-grid">
+      <div class="gen-block">
+        <h4>🧭 Características</h4>
+        <ul>
+          <li>Hiperconectividade</li>
+          <li>Imediatismo</li>
+          <li>Autenticidade</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚙️ O que fazem</h4>
+        <ul>
+          <li>Multitarefas</li>
+          <li>Aprendem online</li>
+          <li>Expressam opiniões constantemente</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>💭 O que pensam</h4>
+        <ul>
+          <li>Tudo precisa ser rápido</li>
+          <li>Minha voz precisa ser ouvida</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⭐ O que valorizam</h4>
+        <ul>
+          <li>Conectividade</li>
+          <li>Liberdade</li>
+          <li>Rapidez</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>✅ Como liderar</h4>
+        <ul>
+          <li>Comunicação rápida e objetiva</li>
+          <li>Use tecnologia</li>
+          <li>Dê espaço para expressão</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚠️ Possíveis conflitos</h4>
+        <ul>
+          <li>Ansiedade por respostas rápidas</li>
+          <li>Dificuldade com processos lentos</li>
+          <li>Questionamento frequente de autoridade</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALPHA -->
+  <div class="gen-content alpha" id="gen-alpha">
+    <div class="gen-header">
+      <div>
+        <span class="gen-badge">2010 – 2024</span>
+        <div class="gen-title">Geração Alpha</div>
+        <p style="color:var(--gray); font-size:0.9rem; max-width:480px;">Nativos digitais que cresceram com IA integrada ao cotidiano. Buscam aprendizagem dinâmica, interativa e personalizada.</p>
+      </div>
+    </div>
+    <div class="gen-grid">
+      <div class="gen-block">
+        <h4>🧭 Características</h4>
+        <ul>
+          <li>Nativos digitais</li>
+          <li>IA integrada</li>
+          <li>Estímulos rápidos</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚙️ O que fazem</h4>
+        <ul>
+          <li>Aprendem com tecnologia</li>
+          <li>Consomem conteúdos visuais</li>
+          <li>Buscam interação constante</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>💭 O que pensam</h4>
+        <ul>
+          <li>Aprender deve ser divertido</li>
+          <li>Tudo pode ser personalizado</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⭐ O que valorizam</h4>
+        <ul>
+          <li>Interatividade</li>
+          <li>Imersão</li>
+          <li>Criatividade</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>✅ Como liderar</h4>
+        <ul>
+          <li>Interação prática</li>
+          <li>Criatividade</li>
+          <li>Comunicação curta e dinâmica</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>🔮 Impactos futuros</h4>
+        <ul>
+          <li>Novos modelos de aprendizagem</li>
+          <li>Mudança radical na comunicação</li>
+          <li>Ambientes mais dinâmicos</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- BETA -->
+  <div class="gen-content beta" id="gen-beta">
+    <div class="gen-header">
+      <div>
+        <span class="gen-badge">2025 – 2039</span>
+        <div class="gen-title">Geração Beta</div>
+        <p style="color:var(--gray); font-size:0.9rem; max-width:480px;">A geração do futuro. O mercado ainda está aprendendo a lidar com a Geração Z… e a próxima já está chegando.</p>
+      </div>
+    </div>
+    <div class="gen-grid">
+      <div class="gen-block">
+        <h4>🔮 Características previstas</h4>
+        <ul>
+          <li>IA integrada ao cotidiano</li>
+          <li>Altíssima conectividade</li>
+          <li>Experiências hiperpersonalizadas</li>
+        </ul>
+      </div>
+      <div class="gen-block">
+        <h4>⚠️ Possíveis desafios</h4>
+        <ul>
+          <li>Excesso de estímulos</li>
+          <li>Baixa atenção</li>
+          <li>Dificuldade em relações presenciais</li>
+        </ul>
+      </div>
+    </div>
+    <div class="quote-box" style="margin-top:1.5rem;">
+      <p class="quote-text">"O mercado ainda está aprendendo a lidar com a Geração Z… e a próxima geração já está chegando."</p>
+    </div>
+  </div>
+
+  <div class="foot-nav">
+    <button class="btn btn-outline" onclick="showSection('conceitos')">← Conceitos</button>
+    <button class="btn btn-primary" onclick="showSection('conflitos')">Ver Conflitos →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION: CONFLITOS -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="conflitos">
+  <div class="section-label">Módulo 3</div>
+  <h2 class="section-title">O Ciclo do<br>Conflito Geracional</h2>
+  <p class="section-desc">O conflito não começa na agressividade. Ele é construído passo a passo.</p>
+
+  <div class="formula">
+    <div class="formula-part">
+      <div class="label">Diferenças de Valores</div>
+      <div class="value" style="color: #ef4444;">DV</div>
+    </div>
+    <div class="formula-op">+</div>
+    <div class="formula-part">
+      <div class="label">Comunicação Inadequada</div>
+      <div class="value" style="color: #f59e0b;">CI</div>
+    </div>
+    <div class="formula-op">→</div>
+    <div class="formula-part">
+      <div class="label">Ruído + Conflito</div>
+      <div class="value" style="color: #3b82f6;">RC</div>
+    </div>
+  </div>
+
+  <div class="cycle-wrap">
+    <div class="cycle-step">
+      <div class="cycle-num" style="background: rgba(239,68,68,0.2); color: #f87171;">1</div>
+      <div class="cycle-content">
+        <h4>Expectativas Diferentes</h4>
+        <p>Cada geração possui valores, formas de trabalhar e expectativas sobre liderança completamente diferentes. Ex: um líder espera silêncio e execução; o colaborador espera participação e diálogo.</p>
+      </div>
+    </div>
+    <div class="cycle-arrow">↓</div>
+    <div class="cycle-step">
+      <div class="cycle-num" style="background: rgba(245,158,11,0.2); color: #fbbf24;">2</div>
+      <div class="cycle-content">
+        <h4>Falha na Comunicação</h4>
+        <p>As pessoas começam a interpretar errado, assumir intenções e reagir emocionalmente, sem verificar o real significado da mensagem.</p>
+      </div>
+    </div>
+    <div class="cycle-arrow">↓</div>
+    <div class="cycle-step">
+      <div class="cycle-num" style="background: rgba(234,179,8,0.2); color: #fde047;">3</div>
+      <div class="cycle-content">
+        <h4>Desentendimento</h4>
+        <p>O problema deixa de ser técnico e passa a ser relacional. A conversa sobre trabalho vira uma conversa sobre quem está certo.</p>
+      </div>
+    </div>
+    <div class="cycle-arrow">↓</div>
+    <div class="cycle-step">
+      <div class="cycle-num" style="background: rgba(249,115,22,0.2); color: #fb923c;">4</div>
+      <div class="cycle-content">
+        <h4>Necessidades Frustradas</h4>
+        <p>Cada lado sente que não está sendo ouvido e não está sendo valorizado. A frustração acumula.</p>
+      </div>
+    </div>
+    <div class="cycle-arrow">↓</div>
+    <div class="cycle-step">
+      <div class="cycle-num" style="background: rgba(220,38,38,0.2); color: #f87171;">5</div>
+      <div class="cycle-content">
+        <h4>Oposição</h4>
+        <p>Começam resistências, confrontos, ironias e sabotagens silenciosas no dia a dia.</p>
+      </div>
+    </div>
+    <div class="cycle-arrow">↓</div>
+    <div class="cycle-step">
+      <div class="cycle-num" style="background: rgba(127,29,29,0.4); color: #fca5a5;">6</div>
+      <div class="cycle-content">
+        <h4>Isolamento / Agressividade</h4>
+        <p>O conflito se torna emocional, repetitivo e prejudicial ao clima organizacional como um todo.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-box" style="margin-top: 2rem;">
+    <p class="quote-text">"O conflito não explode do nada. Ele vai sendo construído."</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3 style="font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; margin-bottom:1rem;">Exemplos de Conflitos Comuns</h3>
+
+  <div class="cards-grid">
+    <div class="card" style="--card-accent: #ef4444;">
+      <div class="card-icon">🏛️</div>
+      <h3>Hierarquia vs. Horizontalidade</h3>
+      <p>Boomers e Gen X tendem a valorizar a hierarquia; Millennials e Gen Z preferem estruturas mais horizontais e colaborativas.</p>
+    </div>
+    <div class="card" style="--card-accent: #f59e0b;">
+      <div class="card-icon">📱</div>
+      <h3>Uso de Tecnologia</h3>
+      <p>Gerações mais antigas podem resistir a novas ferramentas; as mais jovens ficam frustradas com processos lentos e analógicos.</p>
+    </div>
+    <div class="card" style="--card-accent: #8b5cf6;">
+      <div class="card-icon">📣</div>
+      <h3>Forma de Feedback</h3>
+      <p>Enquanto algumas gerações preferem feedback periódico e formal, outras esperam retorno constante e imediato.</p>
+    </div>
+    <div class="card" style="--card-accent: #10b981;">
+      <div class="card-icon">🕐</div>
+      <h3>Velocidade e Ritmo</h3>
+      <p>A Gen Z pode ser impaciente com processos lentos; colaboradores mais experientes podem achar o ritmo acelerado irresponsável.</p>
+    </div>
+  </div>
+
+  <div class="foot-nav">
+    <button class="btn btn-outline" onclick="showSection('geracoes')">← Gerações</button>
+    <button class="btn btn-primary" onclick="showSection('comunicacao')">Comunicação →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION: COMUNICAÇÃO -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="comunicacao">
+  <div class="section-label">Módulo 4</div>
+  <h2 class="section-title">Estratégias de<br>Comunicação por Geração</h2>
+  <p class="section-desc">Comunicar bem não é falar do seu jeito. É fazer o outro compreender.</p>
+
+  <div class="cards-grid">
+    <div class="card" style="--card-accent: #f59e0b;">
+      <div class="card-icon">🟡</div>
+      <h3>Baby Boomers</h3>
+      <p style="color:var(--gray);font-size:0.82rem;margin-bottom:0.75rem;">Valorizam experiência e hierarquia</p>
+      <div style="margin-bottom:0.5rem;">
+        <span class="strategy-tag">Valorizar trajetória</span>
+        <span class="strategy-tag">Ser respeitoso</span>
+        <span class="strategy-tag">Demonstrar comprometimento</span>
+      </div>
+    </div>
+
+    <div class="card" style="--card-accent: #10b981;">
+      <div class="card-icon">🟢</div>
+      <h3>Geração X</h3>
+      <p style="color:var(--gray);font-size:0.82rem;margin-bottom:0.75rem;">Objetivos e independentes, focados em resultado</p>
+      <div style="margin-bottom:0.5rem;">
+        <span class="strategy-tag">Seja direto</span>
+        <span class="strategy-tag">Dê autonomia</span>
+        <span class="strategy-tag">Evite rodeios</span>
+      </div>
+    </div>
+
+    <div class="card" style="--card-accent: #8b5cf6;">
+      <div class="card-icon">🟣</div>
+      <h3>Millennials (Gen Y)</h3>
+      <p style="color:var(--gray);font-size:0.82rem;margin-bottom:0.75rem;">Precisam de propósito e participação</p>
+      <div style="margin-bottom:0.5rem;">
+        <span class="strategy-tag">Explique o porquê</span>
+        <span class="strategy-tag">Incentive participação</span>
+        <span class="strategy-tag">Feedback constante</span>
+      </div>
+    </div>
+
+    <div class="card" style="--card-accent: #3b82f6;">
+      <div class="card-icon">🔵</div>
+      <h3>Geração Z</h3>
+      <p style="color:var(--gray);font-size:0.82rem;margin-bottom:0.75rem;">Veloz, digital e autêntica</p>
+      <div style="margin-bottom:0.5rem;">
+        <span class="strategy-tag">Comunicação rápida</span>
+        <span class="strategy-tag">Recursos visuais</span>
+        <span class="strategy-tag">Objetividade</span>
+      </div>
+    </div>
+
+    <div class="card" style="--card-accent: #ec4899;">
+      <div class="card-icon">🩷</div>
+      <h3>Geração Alpha</h3>
+      <p style="color:var(--gray);font-size:0.82rem;margin-bottom:0.75rem;">Hiperconectada e dinâmica</p>
+      <div style="margin-bottom:0.5rem;">
+        <span class="strategy-tag">Interação prática</span>
+        <span class="strategy-tag">Criatividade</span>
+        <span class="strategy-tag">Comunicação curta</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-box" style="margin-top: 2.5rem;">
+    <p class="quote-text">"Nenhuma geração é melhor. Cada uma foi adaptada ao contexto em que cresceu."</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3 style="font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; margin-bottom:0.5rem;">Prioridades de Carreira por Geração</h3>
+  <p style="color:var(--gray); font-size:0.9rem; margin-bottom:2rem;">O significado do trabalho mudou ao longo do tempo.</p>
+
+  <div class="two-col">
+    <div class="card" style="--card-accent: #f59e0b;">
+      <h3 style="margin-bottom:1rem;">Gerações Mais Antigas</h3>
+      <ul>
+        <li>Estabilidade e segurança</li>
+        <li>Permanência na empresa</li>
+        <li>Hierarquia clara</li>
+        <li>Reconhecimento por tempo de serviço</li>
+      </ul>
+    </div>
+    <div class="card" style="--card-accent: #8b5cf6;">
+      <h3 style="margin-bottom:1rem;">Gerações Mais Novas</h3>
+      <ul>
+        <li>Propósito e impacto social</li>
+        <li>Flexibilidade e qualidade de vida</li>
+        <li>Autonomia</li>
+        <li>Crescimento rápido</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot-nav">
+    <button class="btn btn-outline" onclick="showSection('conflitos')">← Conflitos</button>
+    <button class="btn btn-primary" onclick="showSection('dinamicas')">Dinâmicas →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION: DINÂMICAS -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="dinamicas">
+  <div class="section-label">Módulo 5</div>
+  <h2 class="section-title">Dinâmicas e<br>Atividades Práticas</h2>
+  <p class="section-desc">Atividades para aplicar em sala e tornar o treinamento mais envolvente.</p>
+
+  <div class="dynamic-card">
+    <h3>🖊️ Dinâmica do Papel e Caneta</h3>
+    <p class="desc">Uma atividade simples que revela como pessoas diferentes interpretam a mesma instrução de formas completamente distintas.</p>
+    <ol class="steps-list">
+      <li>Peça para todos pegarem papel e caneta</li>
+      <li>Dê uma instrução simples e igual para todos</li>
+      <li>Cada participante executa sem discutir</li>
+      <li>Compare os resultados em grupo</li>
+      <li>Conecte ao tema: se pessoas da mesma geração já interpretam diferente, imagine gerações completamente diferentes</li>
+    </ol>
+    <div style="margin-top:1.25rem; padding:1rem; background:rgba(0,0,0,0.2); border-radius:8px;">
+      <p style="font-size:0.85rem; color:var(--gray);">🎯 <strong style="color:var(--white);">Objetivo psicológico:</strong> Mostrar que mesmo com a mesma instrução, experiências e percepções influenciam o comportamento e a interpretação.</p>
+    </div>
+  </div>
+
+  <div class="dynamic-card" style="background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(239,68,68,0.08) 100%); border-color: rgba(245,158,11,0.2);">
+    <h3>🔄 Round Table — Mesa Redonda</h3>
+    <p class="desc">Debate coletivo sobre comunicação no ambiente de trabalho. Inspirado na obra do artista plástico Choe U-RAM, que retrata figuras disputando a vez de falar sem nunca ouvir o outro.</p>
+    <p style="color:var(--gray); font-size:0.9rem; margin-bottom:1rem;"><strong style="color:var(--white);">Pergunta disparadora:</strong> "Será que estamos sempre assim? Disputando pela vez de falar e nunca ouvindo o outro?"</p>
+    <ol class="steps-list">
+      <li>O instrutor abre com a pergunta sobre comunicação</li>
+      <li>Cada participante compartilha uma experiência de conflito geracional</li>
+      <li>O grupo identifica padrões em comum</li>
+      <li>Conectar ao ciclo vicioso do conflito</li>
+    </ol>
+  </div>
+
+  <div class="dynamic-card" style="background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(59,130,246,0.08) 100%); border-color: rgba(16,185,129,0.2);">
+    <h3>🗣️ Discussão: Em qual geração você vive?</h3>
+    <p class="desc">Gera identificação pessoal e provoca reflexão sobre como as pessoas se enxergam dentro do mapa geracional.</p>
+    <ol class="steps-list">
+      <li>Peça para cada um identificar sua geração</li>
+      <li>Listar 3 características com as quais se identificam</li>
+      <li>Perguntar: você se identifica totalmente? Existe mistura?</li>
+      <li>Debate: como as características geracionais afetam o trabalho em equipe?</li>
+    </ol>
+    <div style="margin-top:1.25rem; padding:1rem; background:rgba(0,0,0,0.2); border-radius:8px;">
+      <p style="font-size:0.85rem; color:var(--gray);">💡 <strong style="color:var(--white);">Insight:</strong> Nem todas as pessoas seguem exatamente os padrões geracionais. Isso é normal e enriquecedor.</p>
+    </div>
+  </div>
+
+  <div class="foot-nav">
+    <button class="btn btn-outline" onclick="showSection('comunicacao')">← Comunicação</button>
+    <button class="btn btn-primary" onclick="showSection('casos')">Casos Práticos →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION: CASOS PRÁTICOS -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="casos">
+  <div class="section-label">Módulo 6</div>
+  <h2 class="section-title">Estudo de<br>Casos Práticos</h2>
+  <p class="section-desc">Transforme teoria em prática. Analise os casos em grupos de 3 a 4 pessoas, discuta as causas e proponha soluções.</p>
+
+  <div style="margin-bottom:1.5rem; padding:1rem 1.5rem; background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.2); border-radius:10px; font-size:0.88rem; color:var(--gray);">
+    ⏱️ <strong style="color:var(--white);">Tempo sugerido:</strong> 20 a 25 minutos · Dividir em grupos · Cada grupo analisa um caso · Debate final em plenária
+  </div>
+
+  <!-- CASO 1 -->
+  <div class="case-card">
+    <div class="case-header" onclick="toggleCase(this)">
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <span style="background:rgba(239,68,68,0.15); color:#f87171; font-family:'Syne',sans-serif; font-weight:800; font-size:0.75rem; padding:0.3rem 0.7rem; border-radius:4px; white-space:nowrap;">Caso 1</span>
+        <h3>"Um colaborador da Gen Z questiona decisões do gestor da Gen X em público."</h3>
+      </div>
+      <div class="case-toggle">+</div>
+    </div>
+    <div class="case-body">
+      <div class="case-grid">
+        <div class="case-block">
+          <h4 style="color:#f87171;">⚡ O que está acontecendo</h4>
+          <ul>
+            <li>Choque de hierarquia</li>
+            <li>Visões diferentes de participação</li>
+            <li>Conflito de autoridade</li>
+            <li>Expectativas de transparência</li>
+          </ul>
+        </div>
+        <div class="case-block">
+          <h4 style="color:#fbbf24;">🎯 Onde está o conflito</h4>
+          <ul>
+            <li><strong>Valores:</strong> hierarquia x horizontalidade</li>
+            <li><strong>Comunicação:</strong> questionamento público</li>
+            <li><strong>Emoção:</strong> sensação de desrespeito</li>
+          </ul>
+        </div>
+        <div class="case-block">
+          <h4 style="color:#4ade80;">✅ Soluções práticas</h4>
+          <ul>
+            <li>Escuta ativa de ambos os lados</li>
+            <li>Feedback individual e privado</li>
+            <li>Alinhamento de posturas</li>
+            <li>Criar canais seguros de diálogo</li>
+          </ul>
+        </div>
+      </div>
+      <div style="padding:1rem; background:rgba(37,99,235,0.08); border-radius:8px; border-left:3px solid #3b82f6;">
+        <p style="font-size:0.88rem; color:var(--gray);">🤔 <strong style="color:var(--white);">Para discussão:</strong> O colaborador estava errado em questionar? Qual seria a forma mais construtiva de fazer o mesmo questionamento? Como o gestor poderia ter respondido?</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASO 2 -->
+  <div class="case-card">
+    <div class="case-header" onclick="toggleCase(this)">
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <span style="background:rgba(245,158,11,0.15); color:#fbbf24; font-family:'Syne',sans-serif; font-weight:800; font-size:0.75rem; padding:0.3rem 0.7rem; border-radius:4px; white-space:nowrap;">Caso 2</span>
+        <h3>"Um colaborador mais antigo resiste a novas tecnologias."</h3>
+      </div>
+      <div class="case-toggle">+</div>
+    </div>
+    <div class="case-body">
+      <div class="case-grid">
+        <div class="case-block">
+          <h4 style="color:#f87171;">⚡ O que está acontecendo</h4>
+          <ul>
+            <li>Medo de se tornar irrelevante</li>
+            <li>Insegurança com o novo</li>
+            <li>Receio de perder espaço</li>
+          </ul>
+        </div>
+        <div class="case-block">
+          <h4 style="color:#fbbf24;">🎯 Onde está o conflito</h4>
+          <ul>
+            <li><strong>Valores:</strong> tradição x inovação</li>
+            <li><strong>Comunicação:</strong> treinamento inadequado</li>
+            <li><strong>Emoção:</strong> insegurança</li>
+          </ul>
+        </div>
+        <div class="case-block">
+          <h4 style="color:#4ade80;">✅ Soluções práticas</h4>
+          <ul>
+            <li>Acolhimento sem julgamento</li>
+            <li>Treinamento gradual</li>
+            <li>Mentoria reversa</li>
+            <li>Valorizar a experiência existente</li>
+          </ul>
+        </div>
+      </div>
+      <div style="padding:1rem; background:rgba(37,99,235,0.08); border-radius:8px; border-left:3px solid #f59e0b;">
+        <p style="font-size:0.88rem; color:var(--gray);">🤔 <strong style="color:var(--white);">Para discussão:</strong> Como podemos implementar mentoria reversa? O que a empresa pode fazer para que a tecnologia não exclua colaboradores com mais experiência?</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-box" style="margin-top:2rem;">
+    <p class="quote-text">"Uma equipe saudável não elimina diferenças. Ela aprende a usar diferenças como força."</p>
+  </div>
+
+  <div style="margin-top:2.5rem; padding:2rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px;">
+    <h3 style="font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; margin-bottom:1rem;">📋 Papel do Instrutor nas Dinâmicas</h3>
+    <div class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+      <div style="padding:1rem; background:rgba(255,255,255,0.04); border-radius:10px; text-align:center;">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">🧠</div>
+        <p style="font-size:0.88rem; color:var(--gray);">Estimular reflexão sem dar a resposta pronta</p>
+      </div>
+      <div style="padding:1rem; background:rgba(255,255,255,0.04); border-radius:10px; text-align:center;">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">⚖️</div>
+        <p style="font-size:0.88rem; color:var(--gray);">Evitar julgamentos sobre gerações</p>
+      </div>
+      <div style="padding:1rem; background:rgba(255,255,255,0.04); border-radius:10px; text-align:center;">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">🛡️</div>
+        <p style="font-size:0.88rem; color:var(--gray);">Impedir ataques ou generalizações geracionais</p>
+      </div>
+      <div style="padding:1rem; background:rgba(255,255,255,0.04); border-radius:10px; text-align:center;">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">🔗</div>
+        <p style="font-size:0.88rem; color:var(--gray);">Conectar sempre com a realidade da empresa</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot-nav">
+    <button class="btn btn-outline" onclick="showSection('dinamicas')">← Dinâmicas</button>
+    <button class="btn btn-primary" onclick="showHero()">🏠 Início</button>
+  </div>
+</section>
+
+<script>
+  let currentSection = null;
+
+  function showHero() {
+    document.getElementById('hero').scrollIntoView({ behavior: 'smooth' });
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    currentSection = null;
+  }
+
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    const sec = document.getElementById(id);
+    if (sec) {
+      sec.classList.add('active');
+      const navBtn = document.getElementById('nav-' + id);
+      if (navBtn) navBtn.classList.add('active');
+      currentSection = id;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function showGen(id, btn) {
+    document.querySelectorAll('.gen-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.gen-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('gen-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function toggleCase(header) {
+    const body = header.nextElementSibling;
+    const toggle = header.querySelector('.case-toggle');
+    body.classList.toggle('open');
+    toggle.classList.toggle('open');
+  }
+
+  // Auto-open first case
+  document.addEventListener('DOMContentLoaded', () => {
+    const firstCase = document.querySelector('.case-header');
+    if (firstCase) toggleCase(firstCase);
+  });
+</script>
+</body>
+</html>
