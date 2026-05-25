@@ -97,6 +97,49 @@ body {
   line-height: 1.5;
 }
 
+/* CONTADOR ONLINE */
+.contador-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 100px;
+  padding: 8px 20px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInDown 0.8s ease both;
+}
+.contador-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00e676;
+  box-shadow: 0 0 8px #00e676;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:0.5; transform:scale(0.7); }
+}
+.contador-texto {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+.contador-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  color: #00e676;
+}
+@keyframes fadeInDown {
+  from { opacity:0; transform:translateY(-10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
 /* PROGRESS */
 .progress-wrap {
   margin-bottom: 28px;
@@ -484,6 +527,10 @@ body {
     <div class="badge">✨ Teste Viral de Personalidade ✨</div>
     <h1 class="title">QUAL GERAÇÃO<br>VIVE EM VOCÊ?</h1>
     <p class="subtitle">Sua certidão pode dizer uma coisa...<br>mas sua personalidade entrega outra 👀</p>
+    <div class="contador-wrap">
+      <div class="contador-dot"></div>
+      <span class="contador-texto"><span class="contador-num" id="onlineCount">—</span> pessoas online agora</span>
+    </div>
   </div>
 
   <div class="progress-wrap">
@@ -751,9 +798,68 @@ const style = document.createElement("style");
 style.textContent = `
 @keyframes particleFly {
   0% { opacity:1; transform:translateY(0) rotate(0deg) scale(1); }
-  100% { opacity:0; transform:translateY(-120px) rotate(${Math.random()*360}deg) scale(0); }
+  100% { opacity:0; transform:translateY(-120px) rotate(180deg) scale(0); }
 }`;
 document.head.appendChild(style);
+
+// ── CONTADOR SUPABASE ──────────────────────────────────────
+const SUPA_URL = "https://mjspiuhbfklujwtlftpw.supabase.co";
+const SUPA_KEY = "sb_publishable_3InHuy3mno7xGL6-GFaDCQ_1NAS356h";
+const PING_INTERVAL = 20000;   // atualiza presença a cada 20s
+const LIMPAR_APOS  = 45;       // considera offline após 45s sem ping
+
+// gera ID único para esta sessão
+const SESSION_ID = Math.random().toString(36).slice(2) + Date.now();
+
+async function supaFetch(method, path, body) {
+  const headers = {
+    "Content-Type": "application/json",
+    "apikey": SUPA_KEY,
+    "Authorization": "Bearer " + SUPA_KEY,
+  };
+  if (method === "POST") {
+    headers["Prefer"] = "resolution=merge-duplicates";
+  }
+  return fetch(SUPA_URL + path, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined
+  });
+}
+
+async function pingPresenca() {
+  await supaFetch("POST", "/rest/v1/visitantes", {
+    session_id: SESSION_ID,
+    ultima_vez: new Date().toISOString()
+  });
+}
+
+async function contarOnline() {
+  const corte = new Date(Date.now() - LIMPAR_APOS * 1000).toISOString();
+  const res = await supaFetch("GET", `/rest/v1/visitantes?ultima_vez=gte.${corte}&select=session_id`);
+  if (!res.ok) return;
+  const dados = await res.json();
+  const total = dados.length || 1;
+  document.getElementById("onlineCount").textContent = total;
+}
+
+async function removerSessao() {
+  await supaFetch("DELETE", `/rest/v1/visitantes?session_id=eq.${SESSION_ID}`);
+}
+
+// inicia
+(async () => {
+  await pingPresenca();
+  await contarOnline();
+  setInterval(async () => {
+    await pingPresenca();
+    await contarOnline();
+  }, PING_INTERVAL);
+})();
+
+// remove ao fechar aba
+window.addEventListener("beforeunload", removerSessao);
+// ────────────────────────────────────────────────────────────
 </script>
 </body>
 </html>
